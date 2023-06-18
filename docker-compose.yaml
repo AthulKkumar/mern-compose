@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  front:
+    build:
+      context: ./react-docker
+      dockerfile: Dockerfile
+    container_name: react-container
+    ports:
+      - 3000:3000
+    networks:
+      - mern-stack
+    volumes:
+      - ./react-docker:/app
+    environment:
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./express-docker
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    networks:
+      - mern-stack
+    container_name: express-container
+    volumes:
+      - ./express-docker:/app
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    container_name: mongo-container
+    ports:
+      - 27017:27017
+    networks:
+      - mern-stack
+    volumes:
+      - dataMongo:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_DATABASE=products
+
+networks:
+  mern-stack:
+
+volumes:
+  dataMongo:
